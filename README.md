@@ -2,7 +2,7 @@
 
 ### On Debian based systems:
 ```
-sudo aptitude install python-dev virtualenvwrapper
+sudo aptitude install python-dev virtualenvwrapper libxml2-dev libxslt-dev libff1-dev
 ```
 
 ### Create a virtual environment
