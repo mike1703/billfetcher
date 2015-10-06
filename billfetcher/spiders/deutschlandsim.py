@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import logging
 from scrapy.selector import Selector
 from dateutil.parser import parse
 from urlparse import urljoin
@@ -34,10 +35,10 @@ class DeutschlandsimSpider(scrapy.Spider):
                                                 )
     def after_login(self, response):
         if 'Passwort falsch' in response.body:
-            self.log('Login failed', level=scrapy.log.ERROR)
+            logging.log(logging.ERROR, 'Login failed')
             return
         else:
-            self.log('Login successful', level=scrapy.log.INFO)
+            logging.log(logging.INFO, 'Login successful')
             return scrapy.Request(url='https://service.deutschlandsim.de/mytariff/invoice/show',
                                   callback=self.parse_invoice_list
                                   )
@@ -58,7 +59,7 @@ class DeutschlandsimSpider(scrapy.Spider):
                 # "/mytariff/invoice/showPDF/123456478"
                 invoice_link = invoice_type_selector.xpath("//a/@href")[0].extract()
                 invoice_absolute_link = urljoin(response.url, invoice_link)
-                self.log("Found %s for %s with url %s" % (invoice_type, date.strftime("%Y-%m-%d"), invoice_absolute_link), level=scrapy.log.INFO)
+                logging.log(logging.INFO, "Found %s for %s with url %s" % (invoice_type, date.strftime("%Y-%m-%d"), invoice_absolute_link))
 
                 spider_dir = "%s/%s" % (self.settings['ARCHIVE_DIR'], self.name)
                 filename = "%s/%s-%s.pdf" % (spider_dir, date.strftime("%Y-%m-%d"), invoice_type)
@@ -74,7 +75,7 @@ class DeutschlandsimSpider(scrapy.Spider):
 
     def save_pdf(self, response):
         filename = response.meta['filename']
-        self.log("Downloading %s" % (filename), level=scrapy.log.INFO)
+        logging.log(logging.INFO, "Downloading %s" % (filename))
         with open(filename, 'w') as pdf:
             pdf.write(response.body)
 
